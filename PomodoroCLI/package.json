@@ -29,7 +29,7 @@
     "chalk-animation": "^2.0.3",
     "figlet": "^1.9.4",
     "gradient-string": "^3.0.0",
-    "inquirer": "^13.0.2",
+    "inquirer": "^13.1.0",
     "nanospinner": "^1.2.2"
   },
   "devDependencies": {
