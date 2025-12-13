@@ -1,1 +1,1 @@
-# TypesriptPomodoroCLI
+# TypesriptCLIPomodoro
