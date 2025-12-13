@@ -6,6 +6,10 @@ The goal of **pomots** is to bring the Pomodoro technique to the command line wi
 
 ---
 
+<img width="505" height="191" alt="image" src="https://github.com/user-attachments/assets/b96d85fb-5480-457b-884f-768ece301462" />
+
+---
+
 ## ✨ Features
 
 * Pomodoro sessions directly in the terminal
