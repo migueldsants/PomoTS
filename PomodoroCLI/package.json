@@ -1,0 +1,25 @@
+{
+  "name": "pomodorocli",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "minha-cli": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "chalk-animation": "^2.0.3",
+    "figlet": "^1.9.4",
+    "gradient-string": "^3.0.0",
+    "inquirer": "^13.0.2",
+    "nanospinner": "^1.2.2"
+  }
+}
