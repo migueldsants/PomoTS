@@ -3,9 +3,9 @@ import chalk from "chalk";
 import chalkAnimation from "chalk-animation";
 
 
-async function startup(): Promise<void> {
+async function startup(title: string): Promise<void> {
     console.clear();
-    await title();
+    await titleScreen(title);
     await showBanner();
 }
 
@@ -14,8 +14,7 @@ export default startup;
 const sleep = (ms: number = 2000): Promise<void> =>
     new Promise(resolve => setTimeout(resolve, ms));
 
-async function title(): Promise<void> {
-    const title = "🍅 Pomodoro CLI\n";
+async function titleScreen(title: string): Promise<void> {
 
     const anim = chalkAnimation.rainbow(title);
     await sleep();

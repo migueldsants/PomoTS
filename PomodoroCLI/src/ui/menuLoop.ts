@@ -1,17 +1,9 @@
 import chalk from "chalk";
 import inquirer from "inquirer";
-
-async function handleStart(): Promise<void> {
-    console.log("\nplaceholder)\n");
-}
-
-async function handleSettings(): Promise<void> {
-    console.log("\nplaceholder\n");
-}
-
-export async function menuLoop(): Promise<void> {
+import { timer } from "../timer/pomodoro.js";
+export async function menuLoop(title: string): Promise<void> {
     let shouldExit = false;
-
+    
     while (!shouldExit) {
 
         const { option } = await inquirer.prompt<{ option: string }>([
@@ -29,22 +21,25 @@ export async function menuLoop(): Promise<void> {
         ]);
         switch (option) {
             case "start":
-                await handleStart();
                 console.log(chalk.red("Starting pomodoro...\n"));
+                console.clear();
+                console.log(chalk.green(title));
+                await timer(1500, 300);
                 break;
 
             case "settings":
-                await handleSettings();
                 console.log(chalk.yellow("Starting settings...\n"));
+                console.clear();
+                console.log(chalk.green(title));
                 break;
 
             case "exit":
                 shouldExit = true;
-                console.log("\nFinishing pomodoro...\n");
+                console.log(chalk.red("\nFinishing pomodoro...\n"));
                 break;
 
             default:
-                console.log("Eror: Invalid option selected.");
+                console.log(chalk.red("Error: Invalid option selected."));
                 break;
         }
         if (!shouldExit) {

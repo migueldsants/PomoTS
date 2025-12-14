@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 
-import menuLoop from "./timer/menuLoop.js";
+import menuLoop from "./ui/menuLoop.js";
 import startup from "./ui/startup.js";
 
 
 async function main() {
   console.clear();
 
-  await startup();  
-  await menuLoop(); 
+  const title = "🍅 Pomodoro CLI\n";
+
+  await startup(title);  
+  await menuLoop(title); 
 }
 
 main();
