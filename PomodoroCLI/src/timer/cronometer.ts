@@ -24,14 +24,20 @@ class Cronometer {
         }
     }
 
-    reset() {
+    reset(newDuration: number) {
         this.pause();
-        this.seconds = this.duration;
+        this.duration = newDuration;
+        this.seconds = newDuration;
         this.onTick(this.seconds);
     }
 
     getTime(): number {
         return this.seconds;
+    }
+
+    destroy() {
+        this.pause();
+        this.onTick = () => {};
     }
 }
 

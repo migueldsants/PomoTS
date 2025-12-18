@@ -24,7 +24,7 @@ export async function menuLoop(title: string): Promise<void> {
                 console.log(chalk.red("Starting pomodoro...\n"));
                 console.clear();
                 console.log(chalk.green(title));
-                await timer(1500, 300);
+                await timer(10, 10);
                 break;
 
             case "settings":

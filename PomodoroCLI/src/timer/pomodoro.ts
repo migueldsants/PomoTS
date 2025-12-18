@@ -4,11 +4,21 @@ import figlet from 'figlet';
 import chalk from "chalk";
 import readline from 'readline';
 
-export async function timer(initialTime: number): Promise<string> {
+let isTimerRunning = false;
+
+export async function timer(initialTime: number, breakInitialTime: number): Promise<string> {
+    if (isTimerRunning) {
+        console.log(chalk.yellow('\nA timer is already running. Please complete or stop it before starting a new one.\n'));
+        return 'back';
+    }
+
+    isTimerRunning = true;
     let timeRemaining = initialTime;
     let isPaused = false;
+    let isBreakTime = false;
+    let currentInitialTime = initialTime;
 
-    const cronometer = new Cronometer(initialTime, (seconds: number) => {
+    const cronometer = new Cronometer(currentInitialTime, (seconds: number) => {
         const minutes = Math.floor(seconds / 60);
         const secs = seconds % 60;
         const msg = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
@@ -21,8 +31,9 @@ export async function timer(initialTime: number): Promise<string> {
                     console.error(err);
                     return;
                 }
-                clearLines(2, 7); 
-                console.log(chalk.red("\n" + data));
+                console.clear();
+                console.log(chalk.green(`${isBreakTime ? '🍅 Break Time' : '🍅 Work Time'}`));
+                console.log(chalk[isBreakTime ? 'green' : 'red']("\n" + data));
             }
         );
     });
@@ -30,9 +41,10 @@ export async function timer(initialTime: number): Promise<string> {
     cronometer.start();
 
     while (timeRemaining > 0) {
+        
         const action = isPaused
-            ? await showTimerMenuPaused()
-            : await showTimerMenu();
+            ? await showTimerMenuPaused(isBreakTime)
+            : await showTimerMenu(isBreakTime);
 
         switch (action) {
             case 'pause':
@@ -44,57 +56,85 @@ export async function timer(initialTime: number): Promise<string> {
                 isPaused = false;
                 break;
             case 'restart':
-                cronometer.reset();
-                timeRemaining = initialTime;
+                cronometer.reset(currentInitialTime);
+                timeRemaining = currentInitialTime;
+                break;
+            case 'breaktime':
+                isBreakTime = true;
+                currentInitialTime = breakInitialTime;
+                cronometer.reset(breakInitialTime);
+                timeRemaining = currentInitialTime;
+                cronometer.start();
+                break;
+            case 'backToWork':
+                if (isBreakTime) {
+                    isBreakTime = false;
+                    currentInitialTime = initialTime;
+                    cronometer.reset(initialTime);
+                    timeRemaining = initialTime;
+                    cronometer.start();
+                }
                 break;
             case 'back':
+                cronometer.destroy();
+                isTimerRunning = false;
                 return 'back';
         }
     }
 
+    cronometer.destroy();
+    isTimerRunning = false;
     return 'completed';
 }
 
-function clearLines(startLine: number, endLine: number) {
-    for (let line = startLine; line <= endLine; line++) {
-        readline.cursorTo(process.stdout, 0, line); 
-        readline.clearLine(process.stdout, 0);    
-    }
-    readline.cursorTo(process.stdout, 0, 1);
-}
-
-export async function showTimerMenu(): Promise<string> {
-    const choices = [
-        { name: 'Pause', value: 'pause' },
-        { name: 'Restart', value: 'restart' },
-        { name: 'Go Back', value: 'back' }
-    ];
+export async function showTimerMenu(isBreakTime: boolean = false): Promise<string> {
+    const choices = isBreakTime
+        ? [
+            { name: 'Pause', value: 'pause' },
+            { name: 'Restart', value: 'restart' },
+            { name: 'Back to Work', value: 'backToWork' },
+            { name: 'Go Back', value: 'back' }
+        ]
+        : [
+            { name: 'Pause', value: 'pause' },
+            { name: 'Break Time', value: 'breaktime' },
+            { name: 'Restart', value: 'restart' },
+            { name: 'Go Back', value: 'back' }
+        ];
 
     const { action } = await inquirer.prompt([
         {
             type: 'rawlist',
             name: 'action',
             message: `Options:`,
-            choices: choices
+            choices: choices,
         }
     ]);
 
     return action;
 }
 
-export async function showTimerMenuPaused(): Promise<string> {
-    const choices = [
-        { name: 'Resume', value: 'resume' },
-        { name: 'Restart', value: 'restart' },
-        { name: 'Go Back', value: 'back' }
-    ];
+export async function showTimerMenuPaused(isBreakTime: boolean = false): Promise<string> {
+    const choices = isBreakTime
+        ? [
+            { name: 'Resume', value: 'resume' },
+            { name: 'Restart', value: 'restart' },
+            { name: 'Back to Work', value: 'backToWork' },
+            { name: 'Go Back', value: 'back' }
+        ]
+        : [
+            { name: 'Resume', value: 'resume' },
+            { name: 'Break Time', value: 'breaktime' },
+            { name: 'Restart', value: 'restart' },
+            { name: 'Go Back', value: 'back' }
+        ];
 
     const { action } = await inquirer.prompt([
         {
             type: 'rawlist',
             name: 'action',
             message: `Options:`,
-            choices: choices
+            choices: choices,
         }
     ]);
 
