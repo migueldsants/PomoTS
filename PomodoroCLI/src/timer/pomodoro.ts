@@ -13,7 +13,6 @@ export async function timer(initialTime: number, breakInitialTime: number): Prom
     }
 
     isTimerRunning = true;
-    let timeRemaining = initialTime;
     let isPaused = false;
     let isBreakTime = false;
     let currentInitialTime = initialTime;
@@ -36,55 +35,92 @@ export async function timer(initialTime: number, breakInitialTime: number): Prom
                 console.log(chalk[isBreakTime ? 'green' : 'red']("\n" + data));
             }
         );
+
+        if (seconds <= 0 && !isPaused) {
+            if (!isBreakTime) {
+                isBreakTime = true;
+                currentInitialTime = breakInitialTime;
+            } else {
+                isBreakTime = false;
+                currentInitialTime = initialTime;
+            }
+            cronometer.reset(currentInitialTime);
+            cronometer.start();
+        }
     });
 
     cronometer.start();
 
-    while (timeRemaining > 0) {
-        
-        const action = isPaused
-            ? await showTimerMenuPaused(isBreakTime)
-            : await showTimerMenu(isBreakTime);
+    while (true) {
+        if (isPaused) {
+            const action = await showTimerMenuPaused(isBreakTime);
 
-        switch (action) {
-            case 'pause':
-                cronometer.pause();
-                isPaused = true;
-                break;
-            case 'resume':
-                cronometer.start();
-                isPaused = false;
-                break;
-            case 'restart':
-                cronometer.reset(currentInitialTime);
-                timeRemaining = currentInitialTime;
-                break;
-            case 'breaktime':
-                isBreakTime = true;
-                currentInitialTime = breakInitialTime;
-                cronometer.reset(breakInitialTime);
-                timeRemaining = currentInitialTime;
-                cronometer.start();
-                break;
-            case 'backToWork':
-                if (isBreakTime) {
-                    isBreakTime = false;
-                    currentInitialTime = initialTime;
-                    cronometer.reset(initialTime);
-                    timeRemaining = initialTime;
+            switch (action) {
+                case 'resume':
                     cronometer.start();
-                }
-                break;
-            case 'back':
-                cronometer.destroy();
-                isTimerRunning = false;
-                return 'back';
-        }
-    }
+                    isPaused = false;
+                    break;
+                case 'restart':
+                    cronometer.reset(currentInitialTime);
+                    cronometer.start();
+                    isPaused = false;
+                    break;
+                case 'breaktime':
+                    isBreakTime = true;
+                    currentInitialTime = breakInitialTime;
+                    cronometer.reset(breakInitialTime);
+                    cronometer.start();
+                    isPaused = false;
+                    break;
+                case 'backToWork':
+                    if (isBreakTime) {
+                        isBreakTime = false;
+                        currentInitialTime = initialTime;
+                        cronometer.reset(initialTime);
+                        cronometer.start();
+                        isPaused = false;
+                    }
+                    break;
+                case 'back':
+                    cronometer.destroy();
+                    isTimerRunning = false;
+                    return 'back';
+            }
+        } else {
+            const action = await showTimerMenu(isBreakTime);
 
-    cronometer.destroy();
-    isTimerRunning = false;
-    return 'completed';
+            switch (action) {
+                case 'pause':
+                    cronometer.pause();
+                    isPaused = true;
+                    break;
+                case 'restart':
+                    cronometer.reset(currentInitialTime);
+                    cronometer.start();
+                    break;
+                case 'breaktime':
+                    isBreakTime = true;
+                    currentInitialTime = breakInitialTime;
+                    cronometer.reset(breakInitialTime);
+                    cronometer.start();
+                    break;
+                case 'backToWork':
+                    if (isBreakTime) {
+                        isBreakTime = false;
+                        currentInitialTime = initialTime;
+                        cronometer.reset(initialTime);
+                        cronometer.start();
+                    }
+                    break;
+                case 'back':
+                    cronometer.destroy();
+                    isTimerRunning = false;
+                    return 'back';
+            }
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
 }
 
 export async function showTimerMenu(isBreakTime: boolean = false): Promise<string> {
