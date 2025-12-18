@@ -1,7 +1,16 @@
 #!/usr/bin/env node
 
-import chalk from "chalk";
+import menuLoop from "./ui/menuLoop.js";
+import startup from "./ui/startup.js";
 
-console.clear();
 
-console.log(chalk.green("🍅 Pomodoro CLI "));
+async function main() {
+  console.clear();
+
+  const title = "🍅 Pomodoro CLI\n";
+
+  await startup(title);  
+  await menuLoop(title); 
+}
+
+main();
