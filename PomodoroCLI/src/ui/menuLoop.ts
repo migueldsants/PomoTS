@@ -1,10 +1,13 @@
 import chalk from "chalk";
 import inquirer from "inquirer";
 import { timer } from "../timer/pomodoro.js";
+import { loadSettings, settingsMenu } from "../timer/settings.js";
+
 export async function menuLoop(title: string): Promise<void> {
     let shouldExit = false;
     
     while (!shouldExit) {
+        const settings = await loadSettings();
 
         const { option } = await inquirer.prompt<{ option: string }>([
             {
@@ -24,13 +27,14 @@ export async function menuLoop(title: string): Promise<void> {
                 console.log(chalk.red("Starting pomodoro...\n"));
                 console.clear();
                 console.log(chalk.green(title));
-                await timer(1500, 300);
+                await timer(settings.workDuration * 60, settings.breakDuration * 60);
                 break;
 
             case "settings":
                 console.log(chalk.yellow("Starting settings...\n"));
                 console.clear();
                 console.log(chalk.green(title));
+                await settingsMenu();
                 break;
 
             case "exit":
